@@ -192,7 +192,7 @@ header h1 {
         <span class="total-value" id="total">\0</span>
     </div>
 
-    <div class="count-label" id="countLabel">点数：0点</div>
+    <div class="count-label" id="countLabel">点数:0点</div>
 
     <div class="cash-row">
     <label for="cashInput">お預かり</label>
@@ -203,9 +203,106 @@ header h1 {
     <span class="change-value zero" id="change">¥0</span>
   </div>
   <button class="reset-btn" id="resetBtn">全部リセット</button>
-</div>
-  <p>ここに商品カードが並ぶ予定</p>
-</div>
-
 </body>
+<script>
+const items = [
+  { name: "クッキーパック", price: 680 },
+  { name: "しぼりクッキー", price: 180 },
+  { name: "チョコチップクッキー", price: 280 },
+  { name: "アイシングクッキー", price: 580 },
+  { name: "いもクッキー", price: 230 },
+  { name: "ビスケット", price: 180 },
+  { name: "マフィンプレーン", price: 360 },
+  { name: "マフィン抹茶", price: 420 },
+  { name: "マフィンチョコ", price: 380 },
+  { name: "マフィンバナナ", price: 480 },
+  { name: "スコーン", price: 180 },
+  { name: "犬用クッキー", price: 380 },
+];
+const qtys = new Array(items.length).fill(0);
+const listEl = document.getElementById("list");
+const totalEl = document.getElementById("total");
+const countEl = document.getElementById("countLabel");
+const cashInput = document.getElementById("cashInput");
+const changeEl = document.getElementById("change");
+
+function yen(n) {
+  return "¥" + n.toLocaleString("ja-JP");
+}
+
+function updateChange(total) {
+  const raw = cashInput.value;
+  const cash = raw === "" ? NaN : Number(raw);
+  if (raw === "" || isNaN(cash)) {
+    changeEl.textContent = "¥0";
+    changeEl.className = "change-value zero";
+    return;
+  }
+const diff = cash - total;
+if (diff < 0) {
+    changeEl.textContent = "不足 " + yen(Math.abs(diff));
+    changeEl.className = "change-value short";
+} else {
+    changeEl.textContent = yen(diff);
+    changeEl.className = "change-value ok";
+}
+}
+cashInput.addEventListener("input", () => {
+  const total = items.reduce((sum, item, i) => sum + item.price * qtys[i], 0);
+  updateChange(total);
+});
+
+function render() {
+  listEl.innerHTML = "";
+  items.forEach((item, i) => {
+    const qty = qtys[i];
+    const sub = item.price * qty;
+    const row = document.createElement("div");
+    row.className = "item" + (qty > 0 ? " has-qty" : "");
+    row.innerHTML = `
+      <div class="info">
+        <div class="name">${item.name}</div>
+        <div class="price">${yen(item.price)}</div>
+        <div class="subtotal">${qty > 0 ? yen(sub) : "&nbsp;"}</div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn minus" data-i="${i}">−</button>
+        <span class="qty-val">${qty}</span>
+        <button class="qty-btn plus" data-i="${i}">＋</button>
+      </div>
+    `;
+    listEl.appendChild(row);
+  });
+
+  listEl.querySelectorAll(".minus").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const i = +btn.dataset.i;
+      if (qtys[i] > 0) qtys[i]--;
+      render();
+    });
+  });
+  listEl.querySelectorAll(".plus").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const i = +btn.dataset.i;
+      qtys[i]++;
+      render();
+    });
+  });
+ 
+  const total = items.reduce((sum, item, i) => sum + item.price * qtys[i], 0);
+  const count = qtys.reduce((a, b) => a + b, 0);
+  totalEl.textContent = yen(total);
+  countEl.textContent = "点数: " + count + "点";
+  updateChange(total);
+}
+ 
+document.getElementById("resetBtn").addEventListener("click", () => {
+  for (let i = 0; i < qtys.length; i++) qtys[i] = 0;
+  cashInput.value = "";
+  render();
+});
+ 
+render();
+</script>
+
 </html>
