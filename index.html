@@ -211,11 +211,11 @@ header h1 {
 
 
 <script type="module">
-    
+
 import data from "./item.json" assert { type: "json" };
 console.log(data);
 
-const items = JSON.parse(data);
+const items = data;
 const qtys = new Array(items.length).fill(0);
 const listEl = document.getElementById("list");
 const totalEl = document.getElementById("total");
