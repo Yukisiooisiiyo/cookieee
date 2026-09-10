@@ -182,9 +182,28 @@ header h1 {
 
 <body>
 
-<header><h1>クッキーレジメインメニュー</h1></header>
+<header><h1>クッキーPOSメインメニュー</h1></header>
 
-<div class="list">
+<div class="list" id="list"></div>
+
+<div class="footer">
+    <div class="total-row">
+        <span class="total-label">合計</span>
+        <span class="total-value" id="total">\0</span>
+    </div>
+
+    <div class="count-label" id="countLabel">点数：0点</div>
+
+    <div class="cash-row">
+    <label for="cashInput">お預かり</label>
+    <input type="number" inputmode="numeric" id="cashInput" class="cash-input" placeholder="0">
+  </div>
+  <div class="change-row">
+    <span class="change-label">お釣り</span>
+    <span class="change-value zero" id="change">¥0</span>
+  </div>
+  <button class="reset-btn" id="resetBtn">全部リセット</button>
+</div>
   <p>ここに商品カードが並ぶ予定</p>
 </div>
 
