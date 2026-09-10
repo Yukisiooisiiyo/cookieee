@@ -208,14 +208,14 @@ header h1 {
 </body>
 
 
-<script type="module">
-  import data from "./item.json" assert { type: "json" };
-  console.log(data);
-  
-</script>
 
-<script>
-const items = JSON.parse(items)
+
+<script type="module">
+    
+import data from "./item.json" assert { type: "json" };
+console.log(data);
+
+const items = JSON.parse(data);
 const qtys = new Array(items.length).fill(0);
 const listEl = document.getElementById("list");
 const totalEl = document.getElementById("total");
