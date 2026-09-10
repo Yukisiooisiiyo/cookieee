@@ -110,6 +110,7 @@ header h1 {
     text-align: center;
     font-size: 14px;
     font-weight: 700;
+    color: #8a7a5f;
 }
 .footer {
     position: fixed;
@@ -205,21 +206,16 @@ header h1 {
   </div>
   <button class="reset-btn" id="resetBtn">全部リセット</button>
 </body>
+
+
+<script type="module">
+  import data from "./item.json" assert { type: "json" };
+  console.log(data);
+  
+</script>
+
 <script>
-const items = [
-  { name: "クッキーパック", price: 680 },
-  { name: "しぼりクッキー", price: 180 },
-  { name: "チョコチップクッキー", price: 280 },
-  { name: "アイシングクッキー", price: 580 },
-  { name: "いもクッキー", price: 230 },
-  { name: "ビスケット", price: 180 },
-  { name: "マフィンプレーン", price: 360 },
-  { name: "マフィン抹茶", price: 420 },
-  { name: "マフィンチョコ", price: 380 },
-  { name: "マフィンバナナ", price: 480 },
-  { name: "スコーン", price: 180 },
-  { name: "犬用クッキー", price: 380 },
-];
+const items = JSON.parse(items)
 const qtys = new Array(items.length).fill(0);
 const listEl = document.getElementById("list");
 const totalEl = document.getElementById("total");
