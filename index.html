@@ -223,7 +223,7 @@ header h1 {
     <span class="change-value zero" id="change">¥0</span>
   </div>
 
-  <div class = "save">save</div>
+  <div class = "save" id="save">save</div>
 
   <button class="reset-btn" id="resetBtn">全部リセット</button>
 
@@ -311,7 +311,16 @@ function render() {
   countEl.textContent = "点数: " + count + "点";
   updateChange(total);
 }
- 
+
+document.getElementById("save").addEventListener("click", () => {
+  const combined = items.map((name, i) => ({
+  name: name,
+  qty: qtys[i]
+}));
+const jsoncombined = JSON.stringify(combined, null, "  ");
+console.log(jsoncombined);
+});
+
 document.getElementById("resetBtn").addEventListener("click", () => {
   for (let i = 0; i < qtys.length; i++) qtys[i] = 0;
   cashInput.value = "";
