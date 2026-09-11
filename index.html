@@ -234,10 +234,25 @@ header h1 {
 import data from "./item.json" with { type: "json" };
 console.log(data);
 
-import uriage from "./uriagekosuu.json" with { type: "json" };
-console.log(uriage);
 
-const uriagekosuu = uriage;
+
+const GAS_URL = "https://script.google.com/macros/s/AKfycbx4k7-h_SHNUU2prvV3zcAeJp7yq37fFfaZP3tI07Gr1ptC6tcNlpqEvXAKZfhb3ImfWg/exec"
+
+async function loadUriage() {
+  const res = await fetch(GAS_URL);
+  return await res.json();
+}
+
+async function saveUriage(combined) {
+  await fetch(GAS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify(combined)
+  });
+}
+
+
+
 const items = data;
 const qtys = new Array(items.length).fill(0);
 const listEl = document.getElementById("list");
@@ -309,6 +324,8 @@ function render() {
     });
   });
  
+
+
   const total = items.reduce((sum, item, i) => sum + item.price * qtys[i], 0);
   const count = qtys.reduce((a, b) => a + b, 0);
   totalEl.textContent = yen(total);
@@ -316,14 +333,25 @@ function render() {
   updateChange(total);
 }
 
-document.getElementById("save").addEventListener("click", () => {
+
+
+document.getElementById("save").addEventListener("click", async () => {
+  const uriagekosuu = await loadUriage();
   const combined = items.map((item, i) => ({
   name: item.name,
   qty: qtys[i]+(uriagekosuu.find(u => u.name === item.name)?.qty || 0),
 }));
+
+
+const extra = uriagekosuu.filter(
+  u => !items.some(item => item.name === u.name)
+);
+
+
+combined.push(...extra.map(u => ({ name: u.name, qty: u.qty })));
 const jsoncombined = JSON.stringify(combined, null, "  ");
 console.log(jsoncombined);
-
+await saveUriage(combined);
 });
 
 document.getElementById("resetBtn").addEventListener("click", () => {
