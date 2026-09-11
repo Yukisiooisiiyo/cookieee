@@ -314,7 +314,7 @@ function render() {
 
 document.getElementById("save").addEventListener("click", () => {
   const combined = items.map((name, i) => ({
-  name: name,
+  name: item.name,
   qty: qtys[i]
 }));
 const jsoncombined = JSON.stringify(combined, null, "  ");
