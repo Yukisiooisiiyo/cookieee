@@ -234,6 +234,10 @@ header h1 {
 import data from "./item.json" with { type: "json" };
 console.log(data);
 
+import uriage from "./uriagekosuu.json" with { type: "json" };
+console.log(uriage);
+
+const uriagekosuu = uriage;
 const items = data;
 const qtys = new Array(items.length).fill(0);
 const listEl = document.getElementById("list");
@@ -315,10 +319,11 @@ function render() {
 document.getElementById("save").addEventListener("click", () => {
   const combined = items.map((item, i) => ({
   name: item.name,
-  qty: qtys[i]
+  qty: qtys[i]+(uriagekosuu.find(u => u.name === item.name)?.qty || 0),
 }));
 const jsoncombined = JSON.stringify(combined, null, "  ");
 console.log(jsoncombined);
+
 });
 
 document.getElementById("resetBtn").addEventListener("click", () => {
