@@ -230,28 +230,51 @@ header h1 {
 </div>
 
 <script type="module">
-
 import data from "./item.json" with { type: "json" };
 console.log(data);
-
-
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxXPeloMFJnEFlxfqYsZO1N2-LLCV5_Y3UqQ3Y-JQ88GUcXf0lOe4n_-GpHP0EBXdGncg/exec"
 
 async function loadUriage() {
   const res = await fetch(GAS_URL);
+  if (!res.ok) {
+    throw new Error("load失敗: status " + res.status);
+  }
   return await res.json();
 }
 
 async function saveUriage(combined) {
-  await fetch(GAS_URL, {
+  const res = await fetch(GAS_URL, {
     method: "POST",
     headers: { "Content-Type": "text/plain" },
     body: JSON.stringify(combined)
   });
+  if (!res.ok) {
+    throw new Error("save失敗: status " + res.status);
+  }
+  const json = await res.json();
+  if (json.status !== "ok") {
+    throw new Error("save失敗: レスポンス異常 " + JSON.stringify(json));
+  }
+  return json;
 }
 
+// ▼▼▼ DEBUG (検証が終わったらこのフラグをfalseにするか、ブロックごと削除してOK) ▼▼▼
+const DEBUG = true;
 
+function debugSetButtonText(text) {
+  if (!DEBUG) return;
+  document.getElementById("save").textContent = text;
+}
+
+function debugAlertError(err) {
+  if (!DEBUG) {
+    console.error(err);
+    return;
+  }
+  alert("保存に失敗しました: " + err.message);
+}
+// ▲▲▲ DEBUG ここまで ▲▲▲
 
 const items = data;
 const qtys = new Array(items.length).fill(0);
@@ -273,14 +296,14 @@ function updateChange(total) {
     changeEl.className = "change-value zero";
     return;
   }
-const diff = cash - total;
-if (diff < 0) {
+  const diff = cash - total;
+  if (diff < 0) {
     changeEl.textContent = "不足 " + yen(Math.abs(diff));
     changeEl.className = "change-value short";
-} else {
+  } else {
     changeEl.textContent = yen(diff);
     changeEl.className = "change-value ok";
-}
+  }
 }
 cashInput.addEventListener("input", () => {
   const total = items.reduce((sum, item, i) => sum + item.price * qtys[i], 0);
@@ -323,8 +346,6 @@ function render() {
       render();
     });
   });
- 
-
 
   const total = items.reduce((sum, item, i) => sum + item.price * qtys[i], 0);
   const count = qtys.reduce((a, b) => a + b, 0);
@@ -334,24 +355,42 @@ function render() {
 }
 
 
-
-document.getElementById("save").addEventListener("click", async () => {
+async function doSave() {
   const uriagekosuu = await loadUriage();
   const combined = items.map((item, i) => ({
-  name: item.name,
-  qty: qtys[i]+(uriagekosuu.find(u => u.name === item.name)?.qty || 0),
-}));
+    name: item.name,
+    qty: qtys[i] + (uriagekosuu.find(u => u.name === item.name)?.qty || 0),
+  }));
 
+  const extra = uriagekosuu.filter(
+    u => !items.some(item => item.name === u.name)
+  );
+  combined.push(...extra.map(u => ({ name: u.name, qty: u.qty })));
 
-const extra = uriagekosuu.filter(
-  u => !items.some(item => item.name === u.name)
-);
+  const jsoncombined = JSON.stringify(combined, null, "  ");
+  console.log(jsoncombined);
 
+  await saveUriage(combined);
+}
 
-combined.push(...extra.map(u => ({ name: u.name, qty: u.qty })));
-const jsoncombined = JSON.stringify(combined, null, "  ");
-console.log(jsoncombined);
-await saveUriage(combined);
+document.getElementById("save").addEventListener("click", async () => {
+  const saveBtn = document.getElementById("save");
+  const originalText = saveBtn.textContent;
+
+  debugSetButtonText("保存中…"); // ← DEBUGのみ
+
+  try {
+    await doSave();
+    debugSetButtonText("保存しました！"); // ← DEBUGのみ
+  } catch (err) {
+    debugAlertError(err); 
+    debugSetButtonText(originalText);
+    return;
+  }
+
+  if (DEBUG) {
+    setTimeout(() => { saveBtn.textContent = originalText; }, 1500);
+  }
 });
 
 document.getElementById("resetBtn").addEventListener("click", () => {
@@ -359,7 +398,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   cashInput.value = "";
   render();
 });
- 
+
 render();
 </script>
 </body>
