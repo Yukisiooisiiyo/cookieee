@@ -233,7 +233,7 @@ header h1 {
 import data from "./item.json" with { type: "json" };
 console.log(data);
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxXPeloMFJnEFlxfqYsZO1N2-LLCV5_Y3UqQ3Y-JQ88GUcXf0lOe4n_-GpHP0EBXdGncg/exec"
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzh5KJPpKJdr-AblkWEz7BjDB2EAGeDaB0gLExhR3haYmgfy7mbPTdNJPOQYZ0EfCF7Aw/exec";
 
 async function loadUriage() {
   const res = await fetch(GAS_URL);
@@ -284,25 +284,6 @@ const countEl = document.getElementById("countLabel");
 const cashInput = document.getElementById("cashInput");
 const changeEl = document.getElementById("change");
 
-const FILE_NAME = "uriagekosuu.json";
-const FOLDER_NAME = "CookiePOS";
-
-function getOrCreateFolder() {
-  const folders = DriveApp.getFoldersByName(FOLDER_NAME);
-  if (folders.hasNext()) {
-    return folders.next();
-  }
-  return DriveApp.createFolder(FOLDER_NAME);
-}
-
-function getOrCreateFile() {
-  const folder = getOrCreateFolder();
-  const files = folder.getFilesByName(FILE_NAME);
-  if (files.hasNext()) {
-    return files.next();
-  }
-  return folder.createFile(FILE_NAME, "[]", MimeType.PLAIN_TEXT);
-}
 
 
 function yen(n) {
