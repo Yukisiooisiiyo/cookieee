@@ -360,12 +360,13 @@ async function doSave() {
   const combined = items.map((item, i) => ({
     name: item.name,
     qty: qtys[i] + (uriagekosuu.find(u => u.name === item.name)?.qty || 0),
+    amount: item.price * (qtys[i] + (uriagekosuu.find(u => u.name === item.name)?.qty || 0))
   }));
 
   const extra = uriagekosuu.filter(
     u => !items.some(item => item.name === u.name)
   );
-  combined.push(...extra.map(u => ({ name: u.name, qty: u.qty })));
+  combined.push(...extra.map(u => ({ name: u.name, qty: u.qty, amount: u.amount })));
 
   const jsoncombined = JSON.stringify(combined, null, "  ");
   console.log(jsoncombined);
@@ -377,11 +378,11 @@ document.getElementById("save").addEventListener("click", async () => {
   const saveBtn = document.getElementById("save");
   const originalText = saveBtn.textContent;
 
-  debugSetButtonText("保存中…"); // ← DEBUGのみ
+  debugSetButtonText("保存中…"); 
 
   try {
     await doSave();
-    debugSetButtonText("保存しました！"); // ← DEBUGのみ
+    debugSetButtonText("保存しました！"); 
   } catch (err) {
     debugAlertError(err); 
     debugSetButtonText(originalText);
