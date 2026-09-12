@@ -284,6 +284,27 @@ const countEl = document.getElementById("countLabel");
 const cashInput = document.getElementById("cashInput");
 const changeEl = document.getElementById("change");
 
+const FILE_NAME = "uriagekosuu.json";
+const FOLDER_NAME = "CookiePOS";
+
+function getOrCreateFolder() {
+  const folders = DriveApp.getFoldersByName(FOLDER_NAME);
+  if (folders.hasNext()) {
+    return folders.next();
+  }
+  return DriveApp.createFolder(FOLDER_NAME);
+}
+
+function getOrCreateFile() {
+  const folder = getOrCreateFolder();
+  const files = folder.getFilesByName(FILE_NAME);
+  if (files.hasNext()) {
+    return files.next();
+  }
+  return folder.createFile(FILE_NAME, "[]", MimeType.PLAIN_TEXT);
+}
+
+
 function yen(n) {
   return "¥" + n.toLocaleString("ja-JP");
 }
