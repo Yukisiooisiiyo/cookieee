@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>商品管理メニュー</title>
+<title>クッキーレジメインメニュー</title>
 
 <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -202,11 +202,32 @@ header h1 {
 
 <body ontouchstart="">
 
-<header><h1>商品管理メニュー</h1></header>
+<header><h1>クッキーPOSメインメニュー</h1></header>
 
 <div class="list" id="list"></div>
 
+<div class="footer">
+    <div class="total-row">
+        <span class="total-label">合計</span>
+        <span class="total-value" id="total">\0</span>
+    </div>
 
+    <div class="count-label" id="countLabel">点数:0点</div>
+
+    <div class="cash-row">
+    <label for="cashInput">お預かり</label>
+    <input type="number" inputmode="numeric" id="cashInput" class="cash-input" placeholder="0">
+  </div>
+  <div class="change-row">
+    <span class="change-label">お釣り</span>
+    <span class="change-value zero" id="change">¥0</span>
+  </div>
+
+  <div class = "save" id="save">save</div>
+
+  <button class="reset-btn" id="resetBtn">全部リセット</button>
+
+</div>
 
 <script type="module">
 import data from "./item.json" with { type: "json" };
