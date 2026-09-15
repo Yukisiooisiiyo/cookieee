@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>カウントメニュー</title>
+<title>クッキーレジメインメニュー</title>
 
 <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -173,7 +173,17 @@ header h1 {
 .change-value.zero { color: #a89877; }
 
 
-
+.reset-btn {
+    width: 100%;
+    padding: 7px;
+    border: none;
+    border-radius: 8px;
+    background: #f2f2f2;
+    color: #666;
+    font-size: 13px;
+    font-weight: 700;
+}
+.reset-btn:active { background: #e6e6e6; }  
 
 
 </style>
@@ -182,18 +192,30 @@ header h1 {
 
 <body ontouchstart="">
 
-<header><h1>カウントメニュー</h1></header>
+<header><h1>クッキーPOSメインメニュー</h1></header>
 
 <div class="list" id="list"></div>
 
 <div class="footer">
-    
+    <div class="total-row">
+        <span class="total-label">合計</span>
+        <span class="total-value" id="total">\0</span>
+    </div>
+
     <div class="count-label" id="countLabel">点数:0点</div>
 
     <div class="cash-row">
     <label for="cashInput">お預かり</label>
     <input type="number" inputmode="numeric" id="cashInput" class="cash-input" placeholder="0">
   </div>
+  <div class="change-row">
+    <span class="change-label">お釣り</span>
+    <span class="change-value zero" id="change">¥0</span>
+  </div>
+
+
+
+  <button class="reset-btn" id="resetBtn">全部リセット</button>
 
 </div>
 
@@ -317,7 +339,6 @@ function render() {
     });
   });
 
-
   const total = items.reduce((sum, item, i) => sum + item.price * qtys[i], 0);
   const count = qtys.reduce((a, b) => a + b, 0);
   totalEl.textContent = yen(total);
@@ -363,6 +384,12 @@ document.getElementById("save").addEventListener("click", async () => {
   if (DEBUG) {
     setTimeout(() => { saveBtn.textContent = originalText; }, 1500);
   }
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  for (let i = 0; i < qtys.length; i++) qtys[i] = 0;
+  cashInput.value = "";
+  render();
 });
 
 render();
