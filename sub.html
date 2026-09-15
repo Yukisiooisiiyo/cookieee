@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>クッキーレジメインメニュー</title>
 
 <style>
@@ -15,9 +13,9 @@ body {
     font-family: -apple-system, BlinkMacSystemFont,"Hiragino Sans","Yu Gothic", sans-serif;
     background-color: #d1dde4;
     color:aliceblue;
-    padding-bottom: 330px
+    padding-bottom: 90px
 }
-    
+
 header {
     background: #1e2a38;
     color: #fff;
@@ -29,13 +27,11 @@ header {
     box-shadow:0 2px 6px rgba(0,0,0,0.08);
 }
 
-header h1 { 
+header h1 {
     font-size: 15px;
-    margin: 0; 
+    margin: 0;
     font-weight: 700;
     letter-spacing: 0.02em;
-
-
 }
 
 .list {
@@ -124,8 +120,6 @@ header h1 {
     box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
 }
 
-
-
 .total-row {
     display: flex;
     justify-content: space-between;
@@ -134,60 +128,10 @@ header h1 {
 }
 .total-label { font-size: 12px; color: #8a7a5f; font-weight: 700; }
 .total-value { font-size: 24px; font-weight: 700; color: #c67c1e; }
-.count-label { font-size: 11px; color: #a89877; margin-top: -3px; margin-bottom: 5px; text-align: right; }
-.cash-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
-}
-.cash-row label {
-    font-size: 12px;
-    color: #8a7a5f;
-    font-weight: 700;
-    white-space: nowrap;
-}
-.cash-input {
-    flex: 1;
-    font-size: 16px;
-    font-weight: 700;
-    text-align: right;
-    padding: 6px 8px;
-    border-radius: 8px;
-    border: 1.5px solid #eee0c4;
-    background: #fffdf7;
-    color: #3a2e1f;
-    min-width: 0;
-}
-.cash-input:focus { outline: none; border-color: #e8b04b; }
-.change-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 8px;
-}
-.change-label { font-size: 12px; color: #8a7a5f; font-weight: 700; }
-.change-value { font-size: 20px; font-weight: 700; }
-.change-value.ok { color: #4a8a3a; }
-.change-value.short { color: #c04040; }
-.change-value.zero { color: #a89877; }
-
-
-.reset-btn {
-    width: 100%;
-    padding: 7px;
-    border: none;
-    border-radius: 8px;
-    background: #f2f2f2;
-    color: #666;
-    font-size: 13px;
-    font-weight: 700;
-}
-.reset-btn:active { background: #e6e6e6; }  
-
+.count-label { font-size: 11px; color: #a89877; margin-top: -3px; margin-bottom: 0; text-align: right; }
 
 </style>
-</head> 
+</head>
 
 
 <body ontouchstart="">
@@ -199,108 +143,24 @@ header h1 {
 <div class="footer">
     <div class="total-row">
         <span class="total-label">合計</span>
-        <span class="total-value" id="total">\0</span>
+        <span class="total-value" id="total">¥0</span>
     </div>
 
     <div class="count-label" id="countLabel">点数:0点</div>
-
-    <div class="cash-row">
-    <label for="cashInput">お預かり</label>
-    <input type="number" inputmode="numeric" id="cashInput" class="cash-input" placeholder="0">
-  </div>
-  <div class="change-row">
-    <span class="change-label">お釣り</span>
-    <span class="change-value zero" id="change">¥0</span>
-  </div>
-
-
-
-  <button class="reset-btn" id="resetBtn">全部リセット</button>
-
 </div>
 
 <script type="module">
 import data from "./item.json" with { type: "json" };
-console.log(data);
-
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzh5KJPpKJdr-AblkWEz7BjDB2EAGeDaB0gLExhR3haYmgfy7mbPTdNJPOQYZ0EfCF7Aw/exec";
-
-async function loadUriage() {
-  const res = await fetch(GAS_URL);
-  if (!res.ok) {
-    throw new Error("load失敗: status " + res.status);
-  }
-  return await res.json();
-}
-
-async function saveUriage(combined) {
-  const res = await fetch(GAS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify(combined)
-  });
-  if (!res.ok) {
-    throw new Error("save失敗: status " + res.status);
-  }
-  const json = await res.json();
-  if (json.status !== "ok") {
-    throw new Error("save失敗: レスポンス異常 " + JSON.stringify(json));
-  }
-  return json;
-}
-
-// ▼▼▼ DEBUG
-const DEBUG = true;
-
-function debugSetButtonText(text) {
-  if (!DEBUG) return;
-  document.getElementById("save").textContent = text;
-}
-
-function debugAlertError(err) {
-  if (!DEBUG) {
-    console.error(err);
-    return;
-  }
-  alert("保存に失敗しました: " + err.message);
-}
-// ▲▲▲ DEBUG ここまで ▲▲▲
 
 const items = data;
 const qtys = new Array(items.length).fill(0);
 const listEl = document.getElementById("list");
 const totalEl = document.getElementById("total");
 const countEl = document.getElementById("countLabel");
-const cashInput = document.getElementById("cashInput");
-const changeEl = document.getElementById("change");
-
-
 
 function yen(n) {
   return "¥" + n.toLocaleString("ja-JP");
 }
-
-function updateChange(total) {
-  const raw = cashInput.value;
-  const cash = raw === "" ? NaN : Number(raw);
-  if (raw === "" || isNaN(cash)) {
-    changeEl.textContent = "¥0";
-    changeEl.className = "change-value zero";
-    return;
-  }
-  const diff = cash - total;
-  if (diff < 0) {
-    changeEl.textContent = "不足 " + yen(Math.abs(diff));
-    changeEl.className = "change-value short";
-  } else {
-    changeEl.textContent = yen(diff);
-    changeEl.className = "change-value ok";
-  }
-}
-cashInput.addEventListener("input", () => {
-  const total = items.reduce((sum, item, i) => sum + item.price * qtys[i], 0);
-  updateChange(total);
-});
 
 function render() {
   listEl.innerHTML = "";
@@ -343,54 +203,7 @@ function render() {
   const count = qtys.reduce((a, b) => a + b, 0);
   totalEl.textContent = yen(total);
   countEl.textContent = "点数: " + count + "点";
-  updateChange(total);
 }
-
-
-async function doSave() {
-  const uriagekosuu = await loadUriage();
-  const combined = items.map((item, i) => ({
-    name: item.name,
-    qty: qtys[i] + (uriagekosuu.find(u => u.name === item.name)?.qty || 0),
-    amount: item.price * (qtys[i] + (uriagekosuu.find(u => u.name === item.name)?.qty || 0))
-  }));
-
-  const extra = uriagekosuu.filter(
-    u => !items.some(item => item.name === u.name)
-  );
-  combined.push(...extra.map(u => ({ name: u.name, qty: u.qty, amount: u.amount })));
-
-  const jsoncombined = JSON.stringify(combined, null, "  ");
-  console.log(jsoncombined);
-
-  await saveUriage(combined);
-}
-
-document.getElementById("save").addEventListener("click", async () => {
-  const saveBtn = document.getElementById("save");
-  const originalText = saveBtn.textContent;
-
-  debugSetButtonText("保存中…"); 
-
-  try {
-    await doSave();
-    debugSetButtonText("保存しました！"); 
-  } catch (err) {
-    debugAlertError(err); 
-    debugSetButtonText(originalText);
-    return;
-  }
-
-  if (DEBUG) {
-    setTimeout(() => { saveBtn.textContent = originalText; }, 1500);
-  }
-});
-
-document.getElementById("resetBtn").addEventListener("click", () => {
-  for (let i = 0; i < qtys.length; i++) qtys[i] = 0;
-  cashInput.value = "";
-  render();
-});
 
 render();
 </script>
